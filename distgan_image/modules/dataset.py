@@ -14,7 +14,7 @@ import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
 # for cifar10
-import cPickle as pickle
+import pickle
 
 # List all dir with specific name 
 def list_dir(folder_dir, ext="png"):
@@ -23,7 +23,7 @@ def list_dir(folder_dir, ext="png"):
 
 def unpickle(file):
     fo = open(file, 'rb')
-    dict = pickle.load(fo)
+    dict = pickle.load(fo, encoding='latin1')
     fo.close()
     return dict['data'], dict['labels']
 

@@ -29,9 +29,9 @@ lrelu = partial(leak_relu, leak=0.2) # 0.2 as in GAAN, 0.1 as in SNGAN
 
 def nonlinearity(name, x):
     if 'encoder' in name:
-       return lrelu(x)
+        return lrelu(x)
     else:
-		return tf.nn.relu(x)
+        return tf.nn.relu(x)
 
 def Normalize(name, inputs, num_classes = None, labels = None):
 

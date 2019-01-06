@@ -202,16 +202,10 @@ class DISTGAN(object):
             # lower weights for d_recon to achieve sharper generated images, slightly improved from the original paper
             self.d_cost  = 0.95 * self.d_real + 0.05 * self.d_recon + self.d_fake + self.lambda_p * self.penalty
         elif self.loss_type == 'hinge':
-			
             if self.nnet_type == 'dcgan':
-				self.d_cost = -(0.95 * tf.reduce_mean(tf.minimum(0.,-1 + self.d_real_logit))  + \
-                            0.05 * tf.reduce_mean(tf.minimum(0.,-1 + self.d_recon_logit)) + \
-                            tf.reduce_mean(tf.minimum(0.,-1 - self.d_fake_logit)) + self.lambda_p * self.penalty)  
+                self.d_cost=-(0.95*tf.reduce_mean(tf.minimum(0.,-1+self.d_real_logit))+0.05*tf.reduce_mean(tf.minimum(0.,-1+self.d_recon_logit))+tf.reduce_mean(tf.minimum(0.,-1-self.d_fake_logit))+self.lambda_p*self.penalty)
             else:
-				self.d_cost = -(0.95 * tf.reduce_mean(tf.minimum(0.,-1 + self.d_real_sigmoid))  + \
-                            0.05 * tf.reduce_mean(tf.minimum(0.,-1 + self.d_recon_sigmoid)) + \
-                            tf.reduce_mean(tf.minimum(0.,-1 - self.d_fake_sigmoid)) + self.lambda_p * self.penalty)				
-                                  
+                self.d_cost=-(0.95*tf.reduce_mean(tf.minimum(0.,-1+self.d_real_sigmoid))+0.05*tf.reduce_mean(tf.minimum(0.,-1+self.d_recon_sigmoid))+tf.reduce_mean(tf.minimum(0.,-1-self.d_fake_sigmoid))+self.lambda_p*self.penalty)
         self.r_cost  = self.ae_loss  + self.lambda_r * self.ae_reg
         self.g_cost  = tf.abs(tf.reduce_mean(self.d_real_sigmoid) - tf.reduce_mean(self.d_fake_sigmoid))
 
@@ -247,27 +241,27 @@ class DISTGAN(object):
         else:
             
 			# Create optimizers
-			self.vars_e = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='encoder')
-			self.vars_g = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='generator')
-			self.vars_d = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='discriminator')
+            self.vars_e = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='encoder')
+            self.vars_g = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='generator')
+            self.vars_d = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='discriminator')
 			
-			print('[encoder parameters]')
-			print(self.vars_e)
-			print('[generator parameters]')
-			print(self.vars_g)
-			print('[discriminator parameters]')
-			print(self.vars_d)
+            print('[encoder parameters]')
+            print(self.vars_e)
+            print('[generator parameters]')
+            print(self.vars_g)
+            print('[discriminator parameters]')
+            print(self.vars_d)
 
-			# Setup for weight decay
-			self.global_step = tf.Variable(0, trainable=False)
-			self.learning_rate = tf.train.exponential_decay(self.lr, self.global_step, self.decay_step, self.decay_rate, staircase=True)
+            # Setup for weight decay
+            self.global_step = tf.Variable(0, trainable=False)
+            self.learning_rate = tf.train.exponential_decay(self.lr, self.global_step, self.decay_step, self.decay_rate, staircase=True)
 
-			if self.db_name in ['mnist', 'celeba']:
-				self.opt_r = self.create_optimizer(self.r_cost, self.vars_e + self.vars_g, self.learning_rate, self.beta1, self.beta2)
-			else:
-				self.opt_r = self.create_optimizer(self.r_cost, self.vars_e, self.learning_rate, self.beta1, self.beta2)
-			self.opt_g = self.create_optimizer(self.g_cost, self.vars_g, self.learning_rate, self.beta1, self.beta2)
-			self.opt_d = self.create_optimizer(self.d_cost, self.vars_d, self.learning_rate, self.beta1, self.beta2)
+            if self.db_name in ['mnist', 'celeba']:
+                self.opt_r = self.create_optimizer(self.r_cost, self.vars_e + self.vars_g, self.learning_rate, self.beta1, self.beta2)
+            else:
+                self.opt_r = self.create_optimizer(self.r_cost, self.vars_e, self.learning_rate, self.beta1, self.beta2)
+            self.opt_g = self.create_optimizer(self.g_cost, self.vars_g, self.learning_rate, self.beta1, self.beta2)
+            self.opt_d = self.create_optimizer(self.d_cost, self.vars_d, self.learning_rate, self.beta1, self.beta2)
         
         self.init = tf.global_variables_initializer()
 
